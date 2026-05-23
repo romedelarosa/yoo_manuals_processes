@@ -24,6 +24,7 @@ export default async function EmployeesPage() {
                 <th className="px-4 py-3">Operational roles</th>
                 <th className="px-4 py-3">System access</th>
                 <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -64,6 +65,14 @@ export default async function EmployeesPage() {
                     <Badge tone={employee.status === "active" ? "success" : "neutral"}>
                       {employee.status}
                     </Badge>
+                  </td>
+                  <td className="px-4 py-4">
+                    <ButtonLink
+                      href={`/admin/employees/${employee.id}/edit`}
+                      variant="secondary"
+                    >
+                      Manage access
+                    </ButtonLink>
                   </td>
                 </tr>
               ))}
