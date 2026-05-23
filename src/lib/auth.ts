@@ -83,3 +83,18 @@ export async function requireAdmin() {
 
   return profile;
 }
+
+export async function canClaimInitialOwner() {
+  if (!isSupabaseConfigured()) {
+    return true;
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("can_claim_initial_owner");
+
+  if (error) {
+    return false;
+  }
+
+  return Boolean(data);
+}

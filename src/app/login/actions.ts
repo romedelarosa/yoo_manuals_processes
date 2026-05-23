@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { canClaimInitialOwner } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function signInAction(formData: FormData) {
@@ -28,6 +29,12 @@ export async function signInAction(formData: FormData) {
 }
 
 export async function signUpAction(formData: FormData) {
+  const ownerClaimAvailable = await canClaimInitialOwner();
+
+  if (!ownerClaimAvailable) {
+    redirect("/login?message=Public registration is closed. Ask an admin or manager to create your employee account.");
+  }
+
   const fullName = String(formData.get("fullName") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
