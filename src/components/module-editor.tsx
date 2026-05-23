@@ -1,21 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import {
-  FileQuestion,
-  FileText,
-  Image as ImageIcon,
-  Network,
-  Plus,
-  Save,
-  Trash2,
-  Upload,
-} from "lucide-react";
-import { employeeRoles } from "@/lib/mock-data";
-import type { ManualModule, ModuleAttachment, QuizQuestion } from "@/lib/types";
+import { FileQuestion, Network, Plus, Save, Trash2 } from "lucide-react";
+import { businesses, employeeRoles } from "@/lib/mock-data";
+import type { ManualModule, QuizQuestion } from "@/lib/types";
 import { Badge, Card, FieldLabel, SelectInput, TextArea, TextInput } from "./ui";
 
-export function ModuleEditor({ module }: { module?: ManualModule }) {
+export function ModuleEditor({
+  action,
+  module,
+}: {
+  action?: (formData: FormData) => void | Promise<void>;
+  module?: ManualModule;
+}) {
   const [published, setPublished] = useState(false);
   const [blueprintEnabled, setBlueprintEnabled] = useState(Boolean(module?.blueprint));
   const [quizRequired, setQuizRequired] = useState(Boolean(module?.quiz));
@@ -24,9 +21,6 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
   );
   const [questions, setQuestions] = useState<QuizQuestion[]>(
     module?.quiz?.questions ?? [],
-  );
-  const [attachments, setAttachments] = useState<ModuleAttachment[]>(
-    module?.attachments ?? [],
   );
   const [blueprintSteps, setBlueprintSteps] = useState(
     module?.blueprint?.steps ?? [
@@ -42,16 +36,21 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
 
   return (
     <Card className="p-6">
-      <div className="flex flex-col gap-5">
+      <form action={action} className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <FieldLabel>Title</FieldLabel>
-          <TextInput defaultValue={module?.title ?? ""} placeholder="Module title" />
+          <TextInput
+            name="title"
+            defaultValue={module?.title ?? ""}
+            placeholder="Module title"
+            required
+          />
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <div className="flex flex-col gap-2">
             <FieldLabel>Category</FieldLabel>
-            <SelectInput defaultValue={module?.category ?? "Company-wide"}>
+            <SelectInput name="category" defaultValue={module?.category ?? "Company-wide"}>
               <option>Company-wide</option>
               <option>Conduct</option>
               <option>Privacy</option>
@@ -64,11 +63,12 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
           </div>
           <div className="flex flex-col gap-2">
             <FieldLabel>Version</FieldLabel>
-            <TextInput defaultValue={module?.version ?? "1.0.0"} />
+            <TextInput name="version" defaultValue={module?.version ?? "1.0.0"} />
           </div>
           <div className="flex flex-col gap-2">
             <FieldLabel>Estimated minutes</FieldLabel>
             <TextInput
+              name="estimatedMinutes"
               defaultValue={module?.estimatedMinutes ?? 10}
               min={1}
               type="number"
@@ -79,166 +79,96 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
         <div className="flex flex-col gap-2">
           <FieldLabel>Description</FieldLabel>
           <TextArea
+            name="description"
             defaultValue={module?.description ?? ""}
             placeholder="Short summary employees will see before opening the module"
+            required
           />
         </div>
 
         <div className="flex flex-col gap-2">
           <FieldLabel>Lesson content</FieldLabel>
           <TextArea
+            name="lessonContent"
             defaultValue={module?.sections[0]?.body ?? ""}
             placeholder="First lesson section content"
+            required
           />
         </div>
 
         <Card className="border-[#d7ddd2] bg-[#fbfcf8] p-5 shadow-none">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div className="flex items-start gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-muted text-primary">
-                  <Upload />
-                </div>
-                <div>
-                  <h2 className="text-base font-semibold text-foreground">
-                    Attachment manager
-                  </h2>
-                  <p className="mt-1 text-sm leading-6 text-muted">
-                    Add visual guides for module comprehension or controlled
-                    document downloads for forms, contracts, invoices, and
-                    templates.
-                  </p>
-                </div>
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                Business assignment
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-muted">
+                Employees only see modules assigned to their business.
+              </p>
+              <div className="mt-3 grid gap-2">
+                {businesses.map((business) => (
+                  <label
+                    key={business.id}
+                    className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-white px-3 text-sm"
+                  >
+                    <input
+                      type="checkbox"
+                      name="businessIds"
+                      value={business.id}
+                      defaultChecked={
+                        module ? module.businessIds.includes(business.id) : true
+                      }
+                    />
+                    {business.name}
+                  </label>
+                ))}
               </div>
-              <button
-                type="button"
-                onClick={() =>
-                  setAttachments((current) => [
-                    ...current,
-                    {
-                      id: `attachment-${current.length + 1}`,
-                      title: "",
-                      description: "",
-                      fileName: "",
-                      fileType: "image",
-                      mimeType: "image/jpeg",
-                      storagePath: "",
-                      sizeLabel: "0 MB",
-                      downloadable: false,
-                      visibleToEmployees: true,
-                    },
-                  ])
-                }
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-border bg-white px-4 text-sm font-semibold text-foreground transition hover:border-primary"
-              >
-                <Plus />
-                Add attachment
-              </button>
             </div>
 
-            <div className="grid gap-3">
-              {attachments.length === 0 ? (
-                <div className="rounded-md border border-dashed border-border bg-white p-4 text-sm text-muted">
-                  No attachments yet. Keep uploads limited to compressed images
-                  and necessary downloadable documents.
-                </div>
-              ) : null}
-
-              {attachments.map((attachment, index) => (
-                <div
-                  key={attachment.id}
-                  className="rounded-lg border border-border bg-white p-4"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex size-9 items-center justify-center rounded-md bg-surface-muted text-primary">
-                        {attachment.fileType === "image" ? <ImageIcon /> : <FileText />}
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">
-                        Attachment {index + 1}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setAttachments((current) =>
-                          current.filter((item) => item.id !== attachment.id),
-                        )
+            <div>
+              <h2 className="text-base font-semibold text-foreground">
+                Role assignment
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-muted">
+                Select every operational role that should receive this module.
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {employeeRoles.map((role) => (
+                  <label
+                    key={role.id}
+                    className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-white px-3 text-sm"
+                  >
+                    <input
+                      type="checkbox"
+                      name="employeeRoleIds"
+                      value={role.id}
+                      defaultChecked={
+                        module
+                          ? module.employeeRoleIds.includes(role.id)
+                          : role.id === "general-staff" || role.id === "manager"
                       }
-                      className="inline-flex size-9 items-center justify-center rounded-md border border-border text-muted transition hover:border-accent hover:text-accent"
-                      aria-label={`Remove attachment ${index + 1}`}
-                    >
-                      <Trash2 />
-                    </button>
-                  </div>
-
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    <div className="flex flex-col gap-2">
-                      <FieldLabel>Attachment title</FieldLabel>
-                      <TextInput
-                        defaultValue={attachment.title}
-                        placeholder="Treatment room setup visual guide"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <FieldLabel>File type</FieldLabel>
-                      <SelectInput defaultValue={attachment.fileType}>
-                        <option value="image">Image / photo guide</option>
-                        <option value="pdf">PDF document</option>
-                        <option value="document">Document template</option>
-                        <option value="spreadsheet">Spreadsheet</option>
-                      </SelectInput>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid gap-4 md:grid-cols-2">
-                    <div className="flex flex-col gap-2">
-                      <FieldLabel>File</FieldLabel>
-                      <input
-                        type="file"
-                        className="min-h-11 rounded-md border border-border bg-white px-3 py-2 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-foreground"
-                        accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx,.xls,.xlsx"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <FieldLabel>Description</FieldLabel>
-                      <TextInput
-                        defaultValue={attachment.description ?? ""}
-                        placeholder="How employees should use this attachment"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    <label className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-surface-muted px-3 text-sm">
-                      <input
-                        type="checkbox"
-                        defaultChecked={attachment.visibleToEmployees}
-                      />
-                      Visible to assigned employees
-                    </label>
-                    <label className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-surface-muted px-3 text-sm">
-                      <input
-                        type="checkbox"
-                        defaultChecked={attachment.downloadable}
-                      />
-                      Allow download
-                    </label>
-                  </div>
-                </div>
-              ))}
+                    />
+                    {role.name}
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         </Card>
 
         <div className="grid gap-3 md:grid-cols-3">
           <label className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-surface-muted px-3 text-sm">
-            <input type="checkbox" defaultChecked={module?.required ?? true} />
+            <input
+              type="checkbox"
+              name="required"
+              defaultChecked={module?.required ?? true}
+            />
             Required module
           </label>
           <label className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-surface-muted px-3 text-sm">
             <input
               type="checkbox"
+              name="quizRequired"
               checked={quizRequired}
               onChange={(event) => setQuizRequired(event.target.checked)}
             />
@@ -247,6 +177,7 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
           <label className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-surface-muted px-3 text-sm">
             <input
               type="checkbox"
+              name="acknowledgmentRequired"
               defaultChecked={module?.acknowledgmentRequired ?? true}
             />
             Requires acknowledgment
@@ -261,39 +192,52 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                   Checkpoint access
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-muted">
-                  Business managers can keep a checkpoint closed while employees
-                  review the module, then open it when they are ready to assess
-                  comprehension.
+                  Keep the checkpoint closed while employees review the module,
+                  then open it when ready.
                 </p>
               </div>
               <label className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-white px-4 text-sm font-semibold">
                 <input
                   type="checkbox"
+                  name="checkpointOpen"
                   checked={checkpointOpen}
                   onChange={(event) => setCheckpointOpen(event.target.checked)}
                 />
                 {checkpointOpen ? "Open to employees" : "Closed to employees"}
               </label>
             </div>
+
             <div className="mt-4 grid gap-3 md:grid-cols-4">
               <div className="flex flex-col gap-2">
                 <FieldLabel>Passing score</FieldLabel>
-                <TextInput defaultValue={module?.quiz?.passingScore ?? 80} type="number" />
+                <TextInput
+                  name="passingScore"
+                  defaultValue={module?.quiz?.passingScore ?? 80}
+                  type="number"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <FieldLabel>Time limit</FieldLabel>
                 <TextInput
+                  name="timeLimitMinutes"
                   defaultValue={module?.quiz?.timeLimitMinutes ?? 10}
                   type="number"
                 />
               </div>
               <div className="flex flex-col gap-2">
                 <FieldLabel>Max attempts</FieldLabel>
-                <TextInput defaultValue={module?.quiz?.maxAttempts ?? 2} type="number" />
+                <TextInput
+                  name="maxAttempts"
+                  defaultValue={module?.quiz?.maxAttempts ?? 2}
+                  type="number"
+                />
               </div>
               <div className="flex flex-col gap-2">
                 <FieldLabel>Mode</FieldLabel>
-                <SelectInput defaultValue={module?.quiz?.assessmentMode ?? "closed_reference"}>
+                <SelectInput
+                  name="assessmentMode"
+                  defaultValue={module?.quiz?.assessmentMode ?? "closed_reference"}
+                >
                   <option value="closed_reference">Closed-reference</option>
                   <option value="open_reference">Open-reference</option>
                 </SelectInput>
@@ -311,9 +255,8 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                       Manual question bank
                     </h3>
                     <p className="mt-1 text-sm leading-6 text-muted">
-                      Build approved questions manually for now. Later, AI can
-                      create draft questions with the same fields, but employees
-                      should only receive active, admin-approved questions.
+                      Add approved questions manually for now. This structure can
+                      support AI-drafted questions later.
                     </p>
                   </div>
                 </div>
@@ -330,7 +273,6 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                         explanation: "",
                         difficulty: "easy",
                         topicTag: "",
-                        relatedSectionId: module?.sections[0]?.id,
                         active: true,
                         source: "manual",
                       },
@@ -344,10 +286,11 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
               </div>
 
               <div className="mt-4 flex flex-col gap-3">
+                <input type="hidden" name="questionCount" value={questions.length} />
                 {questions.length === 0 ? (
                   <div className="rounded-md border border-dashed border-border bg-[#fbfcf8] p-4 text-sm text-muted">
-                    No questions yet. Add manual questions to create a
-                    randomized approved pool for this checkpoint.
+                    No questions yet. You can create the module now and add
+                    questions later.
                   </div>
                 ) : null}
 
@@ -357,18 +300,9 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                     className="rounded-lg border border-border bg-[#fbfcf8] p-4"
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-foreground">
-                          Question {index + 1}
-                        </p>
-                        <span className="rounded-full border border-border bg-white px-2.5 py-1 text-xs font-medium text-muted">
-                          {question.source === "manual"
-                            ? "Manual"
-                            : question.source === "ai_approved"
-                              ? "AI approved"
-                              : "AI draft"}
-                        </span>
-                      </div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Question {index + 1}
+                      </p>
                       <button
                         type="button"
                         onClick={() =>
@@ -386,6 +320,7 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                     <div className="mt-4 flex flex-col gap-2">
                       <FieldLabel>Question</FieldLabel>
                       <TextArea
+                        name={`question_${index}`}
                         defaultValue={question.question}
                         placeholder="What should an employee do when..."
                       />
@@ -393,9 +328,13 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
 
                     <div className="mt-4 grid gap-4 md:grid-cols-3">
                       {question.options.map((option, optionIndex) => (
-                        <div key={`${question.id}-${optionIndex}`} className="flex flex-col gap-2">
+                        <div
+                          key={`${question.id}-${optionIndex}`}
+                          className="flex flex-col gap-2"
+                        >
                           <FieldLabel>Option {optionIndex + 1}</FieldLabel>
                           <TextInput
+                            name={`question_${index}_option_${optionIndex}`}
                             defaultValue={option}
                             placeholder={`Answer choice ${optionIndex + 1}`}
                           />
@@ -407,13 +346,17 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                       <div className="flex flex-col gap-2">
                         <FieldLabel>Correct answer</FieldLabel>
                         <TextInput
+                          name={`question_${index}_answer`}
                           defaultValue={question.answer}
                           placeholder="Must match one answer choice"
                         />
                       </div>
                       <div className="flex flex-col gap-2">
                         <FieldLabel>Difficulty</FieldLabel>
-                        <SelectInput defaultValue={question.difficulty ?? "easy"}>
+                        <SelectInput
+                          name={`question_${index}_difficulty`}
+                          defaultValue={question.difficulty ?? "easy"}
+                        >
                           <option value="easy">Easy</option>
                           <option value="medium">Medium</option>
                           <option value="hard">Hard</option>
@@ -422,6 +365,7 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                       <div className="flex flex-col gap-2">
                         <FieldLabel>Topic tag</FieldLabel>
                         <TextInput
+                          name={`question_${index}_topicTag`}
                           defaultValue={question.topicTag ?? ""}
                           placeholder="Privacy, escalation, conduct"
                         />
@@ -432,27 +376,19 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                       <div className="flex flex-col gap-2">
                         <FieldLabel>Explanation</FieldLabel>
                         <TextArea
+                          name={`question_${index}_explanation`}
                           defaultValue={question.explanation ?? ""}
                           placeholder="Shown in review reports or future learning feedback."
                         />
                       </div>
-                      <div className="flex flex-col gap-3">
-                        <div className="flex flex-col gap-2">
-                          <FieldLabel>Related section</FieldLabel>
-                          <SelectInput defaultValue={question.relatedSectionId ?? ""}>
-                            <option value="">No section selected</option>
-                            {module?.sections.map((section) => (
-                              <option key={section.id} value={section.id}>
-                                {section.title}
-                              </option>
-                            ))}
-                          </SelectInput>
-                        </div>
-                        <label className="flex min-h-12 items-center gap-3 rounded-md border border-border bg-white px-3 text-sm">
-                          <input type="checkbox" defaultChecked={question.active ?? true} />
-                          Active in random pool
-                        </label>
-                      </div>
+                      <label className="flex min-h-12 items-center gap-3 self-end rounded-md border border-border bg-white px-3 text-sm">
+                        <input
+                          type="checkbox"
+                          name={`question_${index}_active`}
+                          defaultChecked={question.active ?? true}
+                        />
+                        Active in random pool
+                      </label>
                     </div>
                   </div>
                 ))}
@@ -474,14 +410,14 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                   </h2>
                   <p className="mt-1 text-sm leading-6 text-muted">
                     Build a service flowchart employees can view inside the
-                    module. Use it for appointment handling, treatment flow,
-                    cash handling, incident escalation, or role handoffs.
+                    module.
                   </p>
                 </div>
               </div>
               <label className="flex min-h-10 items-center gap-2 rounded-md border border-border bg-white px-3 text-sm font-medium">
                 <input
                   type="checkbox"
+                  name="blueprintEnabled"
                   checked={blueprintEnabled}
                   onChange={(event) => setBlueprintEnabled(event.target.checked)}
                 />
@@ -495,6 +431,7 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                   <div className="flex flex-col gap-2">
                     <FieldLabel>Blueprint title</FieldLabel>
                     <TextInput
+                      name="blueprintTitle"
                       defaultValue={module?.blueprint?.title ?? ""}
                       placeholder="Inquiry to completed visit"
                     />
@@ -502,12 +439,18 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                   <div className="flex flex-col gap-2">
                     <FieldLabel>Blueprint description</FieldLabel>
                     <TextInput
+                      name="blueprintDescription"
                       defaultValue={module?.blueprint?.description ?? ""}
                       placeholder="Short description of the process"
                     />
                   </div>
                 </div>
 
+                <input
+                  type="hidden"
+                  name="blueprintStepCount"
+                  value={blueprintSteps.length}
+                />
                 <div className="flex flex-col gap-3">
                   {blueprintSteps.map((step, index) => (
                     <div
@@ -538,13 +481,17 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                         <div className="flex flex-col gap-2">
                           <FieldLabel>Step title</FieldLabel>
                           <TextInput
+                            name={`blueprintStep_${index}_title`}
                             defaultValue={step.title}
                             placeholder="Book appointment"
                           />
                         </div>
                         <div className="flex flex-col gap-2">
                           <FieldLabel>Responsible role</FieldLabel>
-                          <SelectInput defaultValue={step.ownerRoleId}>
+                          <SelectInput
+                            name={`blueprintStep_${index}_role`}
+                            defaultValue={step.ownerRoleId}
+                          >
                             {employeeRoles.map((role) => (
                               <option key={role.id} value={role.id}>
                                 {role.name}
@@ -558,6 +505,7 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                         <div className="flex flex-col gap-2">
                           <FieldLabel>Step description</FieldLabel>
                           <TextArea
+                            name={`blueprintStep_${index}_description`}
                             defaultValue={step.description}
                             placeholder="What should happen in this step?"
                           />
@@ -565,6 +513,7 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
                         <div className="flex flex-col gap-2">
                           <FieldLabel>Escalation note</FieldLabel>
                           <TextArea
+                            name={`blueprintStep_${index}_escalation`}
                             defaultValue={step.escalation ?? ""}
                             placeholder="When should this step be escalated?"
                           />
@@ -598,18 +547,26 @@ export function ModuleEditor({ module }: { module?: ManualModule }) {
           </div>
         </Card>
 
+        <div className="rounded-md border border-dashed border-border bg-surface-muted p-4 text-sm leading-6 text-muted">
+          Photo and document upload storage will be wired through Supabase
+          Storage next. For now, create the module first, then attach files once
+          the storage flow is enabled.
+        </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <button
-            type="button"
-            onClick={() => setPublished(true)}
+            type={action ? "submit" : "button"}
+            onClick={() => {
+              if (!action) setPublished(true);
+            }}
             className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-[#0b4d3c]"
           >
             <Save />
-            Save draft
+            {action ? "Create module" : "Save draft"}
           </button>
-          {published ? <Badge tone="success">Draft saved in demo state</Badge> : null}
+          {published ? <Badge tone="success">Draft saved locally</Badge> : null}
         </div>
-      </div>
+      </form>
     </Card>
   );
 }
