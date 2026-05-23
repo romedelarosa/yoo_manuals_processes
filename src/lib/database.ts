@@ -27,6 +27,16 @@ export type AdminDashboardMetrics = {
   pendingRequired: number;
 };
 
+export type CompletionReportRow = {
+  employeeId: string;
+  employee: string;
+  business: string;
+  assigned: number;
+  completed: number;
+  acknowledged: number;
+  pendingRequired: number;
+};
+
 export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics> {
   if (!isSupabaseConfigured()) {
     const requiredModules = modules.filter((module) => module.required).length;
@@ -132,6 +142,75 @@ export async function getAdminDashboardMetrics(): Promise<AdminDashboardMetrics>
       ({ profile, module }) => !completedProgress.has(`${profile.id}:${module.id}`),
     ).length,
   };
+}
+
+export async function getCompletionReportRows(): Promise<CompletionReportRow[]> {
+  const [employeeRows, moduleRows] = await Promise.all([getEmployees(), getModules()]);
+
+  if (!isSupabaseConfigured()) {
+    return employeeRows.map((employee) => ({
+      employeeId: employee.id,
+      employee: employee.fullName,
+      business: formatBusinessList(employee.businessIds),
+      assigned: moduleRows.filter((module) =>
+        moduleMatchesProfile(
+          { businessIds: module.businessIds, roleIds: module.employeeRoleIds },
+          { businessIds: employee.businessIds, roleIds: employee.employeeRoleIds },
+        ),
+      ).length,
+      completed: 0,
+      acknowledged: 0,
+      pendingRequired: 0,
+    }));
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const [progressResult, acknowledgmentsResult] = await Promise.all([
+    supabase.from("progress").select("user_id,module_id,status"),
+    supabase.from("acknowledgments").select("user_id,module_id,module_version"),
+  ]);
+
+  const completedProgress = new Set(
+    ((progressResult.data ?? []) as AnyRecord[])
+      .filter((record) => record.status === "completed")
+      .map((record) => `${asString(record.user_id)}:${asString(record.module_id)}`),
+  );
+  const acknowledgments = new Set(
+    ((acknowledgmentsResult.data ?? []) as AnyRecord[]).map(
+      (record) =>
+        `${asString(record.user_id)}:${asString(record.module_id)}:${asString(record.module_version)}`,
+    ),
+  );
+
+  return employeeRows.map((employee) => {
+    const assignedModules = moduleRows.filter((module) =>
+      moduleMatchesProfile(
+        { businessIds: module.businessIds, roleIds: module.employeeRoleIds },
+        { businessIds: employee.businessIds, roleIds: employee.employeeRoleIds },
+      ),
+    );
+
+    const completed = assignedModules.filter((module) =>
+      completedProgress.has(`${employee.id}:${module.id}`),
+    ).length;
+    const acknowledged = assignedModules.filter((module) =>
+      acknowledgments.has(`${employee.id}:${module.id}:${module.version}`),
+    ).length;
+    const pendingRequired = assignedModules.filter(
+      (module) =>
+        module.required && !completedProgress.has(`${employee.id}:${module.id}`),
+    ).length;
+
+    return {
+      employeeId: employee.id,
+      employee: employee.fullName || employee.email,
+      business: formatBusinessList(employee.businessIds),
+      assigned: assignedModules.length,
+      completed,
+      acknowledged,
+      pendingRequired,
+    };
+  });
 }
 
 export async function getBusinesses(): Promise<Business[]> {
@@ -394,6 +473,18 @@ function moduleMatchesProfile(
     module.roleIds.some((roleId) => profile.roleIds.includes(roleId));
 
   return businessMatch && roleMatch;
+}
+
+function formatBusinessList(businessIds: BusinessId[]) {
+  if (businessIds.length === 0) return "Unassigned";
+  return businessIds.map((businessId) => getBusinessDisplayName(businessId)).join(" + ");
+}
+
+function getBusinessDisplayName(businessId: BusinessId) {
+  return (
+    fallbackBusinesses.find((business) => business.id === businessId)?.name ??
+    businessId
+  );
 }
 
 function readRelationSlug(value: unknown, fallback = "") {
