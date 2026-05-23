@@ -1,0 +1,16 @@
+<svg width="960" height="540" viewBox="0 0 960 540" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="960" height="540" fill="#F7F8F5"/>
+  <rect x="72" y="72" width="816" height="396" rx="18" fill="#FFFFFF" stroke="#DCE3D6" stroke-width="3"/>
+  <rect x="126" y="126" width="312" height="240" rx="22" fill="#EAF2E7" stroke="#C9D9C2" stroke-width="3"/>
+  <rect x="160" y="164" width="244" height="58" rx="14" fill="#FFFFFF" stroke="#C9D9C2" stroke-width="3"/>
+  <rect x="160" y="244" width="244" height="84" rx="18" fill="#0F5F4A" opacity="0.92"/>
+  <circle cx="188" cy="193" r="10" fill="#D9663D"/>
+  <path d="M540 150H786" stroke="#0F5F4A" stroke-width="12" stroke-linecap="round"/>
+  <path d="M540 204H740" stroke="#8D9A8F" stroke-width="10" stroke-linecap="round"/>
+  <path d="M540 254H802" stroke="#8D9A8F" stroke-width="10" stroke-linecap="round"/>
+  <path d="M540 304H690" stroke="#8D9A8F" stroke-width="10" stroke-linecap="round"/>
+  <rect x="540" y="354" width="166" height="54" rx="10" fill="#FFF0E9" stroke="#F1C5B5" stroke-width="3"/>
+  <path d="M568 381H678" stroke="#D9663D" stroke-width="8" stroke-linecap="round"/>
+  <text x="126" y="421" fill="#17211B" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">Treatment room setup guide</text>
+  <text x="126" y="453" fill="#647065" font-family="Arial, Helvetica, sans-serif" font-size="18">Example visual attachment for SOP modules</text>
+</svg>

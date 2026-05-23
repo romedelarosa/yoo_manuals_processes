@@ -1,0 +1,3 @@
+Employee contract template placeholder.
+
+Production files should be uploaded to the private Supabase Storage bucket and served through signed URLs after module access is verified.

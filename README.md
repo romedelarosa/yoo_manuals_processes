@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Company Manual and Onboarding System
 
-## Getting Started
+Internal web app MVP for YOO Clinic and ORI Wellness Center. The app helps employees read assigned policies, complete checkpoints, sign acknowledgments, and view process blueprint flowcharts for operational workflows.
 
-First, run the development server:
+## Current implementation
+
+- Next.js app router frontend
+- Supabase-ready client helpers
+- Supabase migration with tables, relationships, RLS helpers, and policies
+- Seeded demo data for immediate product review
+- Employee dashboard, module details, quiz flow, acknowledgment flow, and progress screen
+- Admin dashboard, employee list, roles, modules, assignment map, module editor, and reports
+- Service blueprint flowchart module for appointment handling
+- Admin blueprint builder fields for drafting process steps, responsible roles, and escalation notes
+- Closed-reference checkpoint settings for time limits, attempts, randomized questions, and lesson-read unlock behavior
+- Admin checkpoint access toggle so quizzes can be closed or opened to employees by module
+- Module attachments for inline visual guides and controlled document downloads
+- Supabase Storage bucket and attachment metadata table for private, role-scoped files
+- Manual quiz question bank with topic, difficulty, explanation, section mapping, and active/inactive controls
+- AI-ready quiz schema for future admin-reviewed generated question drafts
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Supabase setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create `.env.local` from `.env.example`:
 
-## Learn More
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
 
-To learn more about Next.js, take a look at the following resources:
+Run the migration in `supabase/migrations/001_initial_schema.sql` using the Supabase SQL editor or Supabase CLI.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Important notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The app currently uses demo data from `src/lib/mock-data.ts` so the MVP can be reviewed without live credentials. The next implementation step is replacing demo reads/writes with Supabase queries and server actions while keeping RLS as the source of truth.
