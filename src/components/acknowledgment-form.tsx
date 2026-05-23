@@ -7,6 +7,7 @@ import { ButtonLink, Card, FieldLabel, TextInput } from "./ui";
 
 export function AcknowledgmentForm({ module }: { module: ManualModule }) {
   const [signed, setSigned] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
     <Card className="p-6">
@@ -37,11 +38,11 @@ export function AcknowledgmentForm({ module }: { module: ManualModule }) {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-2">
             <FieldLabel>Employee name</FieldLabel>
-            <TextInput defaultValue="Mika Santos" />
+            <TextInput defaultValue="Signed-in employee" />
           </div>
           <div className="flex flex-col gap-2">
             <FieldLabel>Date</FieldLabel>
-            <TextInput defaultValue="2026-05-23" />
+            <TextInput defaultValue={today} />
           </div>
         </div>
 
@@ -60,8 +61,8 @@ export function AcknowledgmentForm({ module }: { module: ManualModule }) {
 
         {signed ? (
           <div className="rounded-md border border-[#b6dec5] bg-[#e7f6eb] px-4 py-3 text-sm text-success">
-            Acknowledgment captured in demo state. The Supabase table
-            `acknowledgments` is ready for production persistence.
+            Acknowledgment captured for this session. Supabase persistence will
+            store the signed-in user, module version, and timestamp.
           </div>
         ) : null}
       </div>
