@@ -5,13 +5,11 @@ import { ModuleAttachments } from "@/components/module-attachments";
 import { ProcessBlueprintView } from "@/components/process-blueprint";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
 import {
-  demoEmployee,
   getBusinessName,
-  getModuleById,
   getModuleStatus,
   getRoleName,
-  moduleMatchesUser,
 } from "@/lib/access";
+import { getModule } from "@/lib/database";
 
 export default async function ModuleDetailPage({
   params,
@@ -19,9 +17,9 @@ export default async function ModuleDetailPage({
   params: Promise<{ moduleId: string }>;
 }) {
   const { moduleId } = await params;
-  const manualModule = getModuleById(moduleId);
+  const manualModule = await getModule(moduleId);
 
-  if (!manualModule || !moduleMatchesUser(manualModule, demoEmployee)) {
+  if (!manualModule) {
     notFound();
   }
 

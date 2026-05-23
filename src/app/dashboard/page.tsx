@@ -1,19 +1,27 @@
 import { AppShell } from "@/components/app-shell";
 import { ModuleCard, StatGrid } from "@/components/dashboard";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
-import { demoEmployee, getAssignedModules, getCompletionSummary } from "@/lib/access";
+import { getCurrentProfile } from "@/lib/auth";
+import { getModules } from "@/lib/database";
 import { businesses, employeeStats } from "@/lib/mock-data";
 
-export default function DashboardPage() {
-  const assignedModules = getAssignedModules(demoEmployee);
+export default async function DashboardPage() {
+  const [profile, assignedModules] = await Promise.all([
+    getCurrentProfile(),
+    getModules(),
+  ]);
   const requiredModules = assignedModules.filter((module) => module.required);
   const optionalModules = assignedModules.filter((module) => !module.required);
-  const summary = getCompletionSummary(demoEmployee);
+  const summary = {
+    assigned: assignedModules.length,
+    completed: 0,
+    inProgress: 0,
+  };
 
   return (
     <AppShell>
       <PageHeader
-        title={`Welcome, ${demoEmployee.fullName}`}
+        title={`Welcome, ${profile?.full_name ?? "Employee"}`}
         description="Your assigned onboarding modules, policy refreshers, checkpoints, and acknowledgments are scoped by business and role."
         actions={<ButtonLink href="/progress" variant="secondary">View progress</ButtonLink>}
       />
@@ -34,19 +42,14 @@ export default function DashboardPage() {
               Assigned profile
             </p>
             <p className="mt-1 text-sm text-muted">
-              {demoEmployee.jobTitle} with role-specific access.
+              {profile?.job_title ?? "Role-specific"} access.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {demoEmployee.businessIds.map((businessId) => {
+            {businesses.map((business) => business.id).map((businessId) => {
               const business = businesses.find((item) => item.id === businessId);
               return <Badge key={businessId}>{business?.name ?? businessId}</Badge>;
             })}
-            {demoEmployee.employeeRoleIds.map((roleId) => (
-              <Badge key={roleId} tone="accent">
-                {roleId}
-              </Badge>
-            ))}
           </div>
         </div>
       </Card>

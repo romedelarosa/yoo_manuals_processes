@@ -1,9 +1,11 @@
 import { AppShell } from "@/components/app-shell";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
 import { getBusinessName, getRoleName } from "@/lib/access";
-import { employees } from "@/lib/mock-data";
+import { getEmployees } from "@/lib/database";
 
-export default function EmployeesPage() {
+export default async function EmployeesPage() {
+  const employees = await getEmployees();
+
   return (
     <AppShell mode="admin">
       <PageHeader

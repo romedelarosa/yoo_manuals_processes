@@ -1,8 +1,10 @@
 import { AppShell } from "@/components/app-shell";
 import { Badge, Card, PageHeader } from "@/components/ui";
-import { employeeRoles, systemRoles } from "@/lib/mock-data";
+import { getRoleDefinitions } from "@/lib/database";
 
-export default function RolesPage() {
+export default async function RolesPage() {
+  const { employeeRoles, systemRoles } = await getRoleDefinitions();
+
   return (
     <AppShell mode="admin">
       <PageHeader

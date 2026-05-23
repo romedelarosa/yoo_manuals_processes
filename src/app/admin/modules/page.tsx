@@ -2,9 +2,11 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
 import { getBusinessName, getRoleName } from "@/lib/access";
-import { modules } from "@/lib/mock-data";
+import { getModules } from "@/lib/database";
 
-export default function ModulesPage() {
+export default async function ModulesPage() {
+  const modules = await getModules();
+
   return (
     <AppShell mode="admin">
       <PageHeader

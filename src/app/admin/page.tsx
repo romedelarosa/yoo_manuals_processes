@@ -1,9 +1,11 @@
 import { AppShell } from "@/components/app-shell";
 import { StatGrid } from "@/components/dashboard";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
-import { adminStats, modules } from "@/lib/mock-data";
+import { adminStats } from "@/lib/mock-data";
+import { getModules } from "@/lib/database";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const modules = await getModules();
   const required = modules.filter((module) => module.required).length;
   const blueprints = modules.filter((module) => module.blueprint).length;
 

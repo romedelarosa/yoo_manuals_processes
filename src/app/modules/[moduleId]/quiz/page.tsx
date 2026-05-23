@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { QuizForm } from "@/components/quiz-form";
 import { ButtonLink, Card } from "@/components/ui";
-import { demoEmployee, getModuleById, moduleMatchesUser } from "@/lib/access";
+import { getModule } from "@/lib/database";
 
 export default async function QuizPage({
   params,
@@ -10,9 +10,9 @@ export default async function QuizPage({
   params: Promise<{ moduleId: string }>;
 }) {
   const { moduleId } = await params;
-  const manualModule = getModuleById(moduleId);
+  const manualModule = await getModule(moduleId);
 
-  if (!manualModule || !moduleMatchesUser(manualModule, demoEmployee)) {
+  if (!manualModule) {
     notFound();
   }
 

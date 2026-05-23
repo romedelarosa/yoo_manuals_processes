@@ -1,6 +1,6 @@
 import { AppShell } from "@/components/app-shell";
 import { Badge, Card, PageHeader } from "@/components/ui";
-import { employees, modules } from "@/lib/mock-data";
+import { getEmployees, getModules } from "@/lib/database";
 
 const reportRows = [
   {
@@ -29,7 +29,9 @@ const reportRows = [
   },
 ];
 
-export default function ReportsPage() {
+export default async function ReportsPage() {
+  const [employees, modules] = await Promise.all([getEmployees(), getModules()]);
+
   return (
     <AppShell mode="admin">
       <PageHeader

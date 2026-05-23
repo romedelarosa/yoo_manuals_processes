@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { ModuleEditor } from "@/components/module-editor";
 import { PageHeader } from "@/components/ui";
-import { getModuleById } from "@/lib/access";
+import { getModule } from "@/lib/database";
 
 export default async function EditModulePage({
   params,
@@ -10,7 +10,7 @@ export default async function EditModulePage({
   params: Promise<{ moduleId: string }>;
 }) {
   const { moduleId } = await params;
-  const manualModule = getModuleById(moduleId);
+  const manualModule = await getModule(moduleId);
 
   if (!manualModule) {
     notFound();

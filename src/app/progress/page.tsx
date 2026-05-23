@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { Badge, Card, PageHeader } from "@/components/ui";
-import {
-  demoEmployee,
-  getAssignedModules,
-  getModuleStatus,
-  getProgressForModule,
-} from "@/lib/access";
+import { getModuleStatus, getProgressForModule } from "@/lib/access";
+import { getModules } from "@/lib/database";
 
-export default function ProgressPage() {
-  const assignedModules = getAssignedModules(demoEmployee);
+export default async function ProgressPage() {
+  const assignedModules = await getModules();
 
   return (
     <AppShell>

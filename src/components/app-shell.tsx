@@ -102,6 +102,11 @@ export function AppShell({
             No public policy pages, no broad downloads, and access is intended
             to be enforced at the database layer.
           </p>
+          <form action="/auth/signout" method="post" className="mt-4">
+            <button className="min-h-9 rounded-md border border-white/20 px-3 text-xs font-semibold text-white transition hover:bg-white/10">
+              Sign out
+            </button>
+          </form>
         </div>
       </aside>
 

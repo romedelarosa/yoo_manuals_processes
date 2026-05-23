@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { AcknowledgmentForm } from "@/components/acknowledgment-form";
 import { AppShell } from "@/components/app-shell";
-import { demoEmployee, getModuleById, moduleMatchesUser } from "@/lib/access";
+import { getModule } from "@/lib/database";
 
 export default async function AcknowledgmentPage({
   params,
@@ -9,9 +9,9 @@ export default async function AcknowledgmentPage({
   params: Promise<{ moduleId: string }>;
 }) {
   const { moduleId } = await params;
-  const manualModule = getModuleById(moduleId);
+  const manualModule = await getModule(moduleId);
 
-  if (!manualModule || !moduleMatchesUser(manualModule, demoEmployee)) {
+  if (!manualModule) {
     notFound();
   }
 
