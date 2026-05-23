@@ -100,12 +100,12 @@ export default async function AdminDashboardPage() {
         </Card>
 
         <Card className="p-5">
-          <h2 className="text-lg font-semibold">Next implementation steps</h2>
+          <h2 className="text-lg font-semibold">System status</h2>
           <div className="mt-4 flex flex-col gap-3 text-sm leading-6 text-muted">
-            <p>1. Connect Supabase Auth and replace demo employee selection.</p>
-            <p>2. Run the SQL migration and test RLS with employee accounts.</p>
-            <p>3. Persist quiz attempts, progress, and acknowledgments.</p>
-            <p>4. Add content editor save/publish workflows.</p>
+            <p>Supabase Auth is connected and public signup is closed.</p>
+            <p>Employee accounts should be created from the admin area.</p>
+            <p>Dashboard metrics now use live Supabase records.</p>
+            <p>Next useful hardening: audit logs, watermarks, and sensitive-module controls.</p>
           </div>
         </Card>
       </div>

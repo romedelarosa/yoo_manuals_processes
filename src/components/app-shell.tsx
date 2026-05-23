@@ -65,8 +65,8 @@ export function AppShell({
             YOO Clinic + ORI Wellness
           </p>
           <p className="mt-1 text-xs leading-5 text-muted">
-            Demo access is role-scoped. Supabase RLS policies are included for
-            production enforcement.
+            Access is scoped by business and role, with Supabase RLS policies
+            enforcing database-level protection.
           </p>
         </div>
 
