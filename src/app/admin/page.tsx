@@ -1,13 +1,45 @@
+import { AlertTriangle, FileCheck2, Layers3, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { StatGrid } from "@/components/dashboard";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
-import { adminStats } from "@/lib/mock-data";
-import { getModules } from "@/lib/database";
+import { getAdminDashboardMetrics, getModules } from "@/lib/database";
 
 export default async function AdminDashboardPage() {
-  const modules = await getModules();
+  const [modules, metrics] = await Promise.all([
+    getModules(),
+    getAdminDashboardMetrics(),
+  ]);
   const required = modules.filter((module) => module.required).length;
   const blueprints = modules.filter((module) => module.blueprint).length;
+  const stats = [
+    {
+      label: "Active employees",
+      value: String(metrics.activeEmployees),
+      caption: "Active profiles in Supabase",
+      icon: Users,
+    },
+    {
+      label: "Published modules",
+      value: String(metrics.publishedModules),
+      caption: `${metrics.requiredModules} required, ${metrics.optionalModules} optional`,
+      icon: Layers3,
+    },
+    {
+      label: "Acknowledgment rate",
+      value: `${metrics.acknowledgmentRate}%`,
+      caption:
+        metrics.acknowledgmentTotal > 0
+          ? `${metrics.acknowledgmentCompleted}/${metrics.acknowledgmentTotal} required acknowledgments`
+          : "No required acknowledgments yet",
+      icon: FileCheck2,
+    },
+    {
+      label: "Pending required",
+      value: String(metrics.pendingRequired),
+      caption: "Assigned required modules not complete",
+      icon: AlertTriangle,
+    },
+  ];
 
   return (
     <AppShell mode="admin">
@@ -17,7 +49,7 @@ export default async function AdminDashboardPage() {
         actions={<ButtonLink href="/admin/modules/new">Create module</ButtonLink>}
       />
 
-      <StatGrid stats={adminStats} />
+      <StatGrid stats={stats} />
 
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         <Card className="p-5">
@@ -36,6 +68,13 @@ export default async function AdminDashboardPage() {
           </div>
 
           <div className="mt-5 grid gap-3">
+            {modules.length === 0 ? (
+              <div className="rounded-md border border-dashed border-border bg-surface-muted p-5 text-sm text-muted">
+                No active modules yet. Create the first module to start building
+                the onboarding manual.
+              </div>
+            ) : null}
+
             {modules.slice(0, 5).map((module) => (
               <div
                 key={module.id}
