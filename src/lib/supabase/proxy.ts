@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSignedInHomePath } from "@/lib/access";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -52,7 +53,19 @@ export async function updateSession(request: NextRequest) {
 
   if (user && request.nextUrl.pathname === "/login") {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("user_system_roles(system_roles(slug))")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+
+    const roleRows = (profile?.user_system_roles ?? []) as Array<{
+      system_roles?: { slug?: string } | null;
+    }>;
+
+    redirectUrl.pathname = getSignedInHomePath(
+      roleRows.map((row) => row.system_roles?.slug),
+    );
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { isAdminRoleSlug } from "./access";
 import { createSupabaseServerClient, isSupabaseConfigured } from "./supabase/server";
 
 export async function getSessionUser() {
@@ -74,9 +75,9 @@ export async function requireAdmin() {
 
   if (
     !profile ||
-    (!hasSystemRole(profile, "super-admin") &&
-      !hasSystemRole(profile, "business-admin") &&
-      !hasSystemRole(profile, "content-admin"))
+    !(profile.user_system_roles as Array<{ system_roles?: { slug?: string } | null }> | null)?.some(
+      (row) => isAdminRoleSlug(row.system_roles?.slug),
+    )
   ) {
     redirect("/setup?message=Admin access is required. Claim owner access if this is the first account.");
   }

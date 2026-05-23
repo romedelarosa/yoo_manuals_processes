@@ -73,3 +73,17 @@ export function getCompletionSummary(user: EmployeeProfile = demoEmployee) {
     pending: Math.max(assignedModules.length - completed.length - inProgress.length, 0),
   };
 }
+
+export const adminSystemRoleSlugs = new Set([
+  "super-admin",
+  "business-admin",
+  "content-admin",
+]);
+
+export function isAdminRoleSlug(roleSlug: string | null | undefined) {
+  return Boolean(roleSlug && adminSystemRoleSlugs.has(roleSlug));
+}
+
+export function getSignedInHomePath(roleSlugs: Array<string | null | undefined>) {
+  return roleSlugs.some(isAdminRoleSlug) ? "/admin" : "/dashboard";
+}

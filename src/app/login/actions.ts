@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { canClaimInitialOwner } from "@/lib/auth";
+import { getSignedInHomePath } from "@/lib/access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function signInAction(formData: FormData) {
@@ -15,7 +16,7 @@ export async function signInAction(formData: FormData) {
   }
 
   const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
@@ -25,7 +26,21 @@ export async function signInAction(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect(next.startsWith("/") ? next : "/dashboard");
+
+  if (next.startsWith("/") && next !== "/dashboard") {
+    redirect(next);
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("user_system_roles(system_roles(slug))")
+    .eq("auth_user_id", data.user.id)
+    .maybeSingle();
+
+  const roleRows = (profile?.user_system_roles ?? []) as Array<{
+    system_roles?: { slug?: string } | null;
+  }>;
+  redirect(getSignedInHomePath(roleRows.map((row) => row.system_roles?.slug)));
 }
 
 export async function signUpAction(formData: FormData) {
