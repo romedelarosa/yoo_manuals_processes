@@ -9,9 +9,11 @@ import { Badge, Card, FieldLabel, SelectInput, TextArea, TextInput } from "./ui"
 export function ModuleEditor({
   action,
   module,
+  submitLabel,
 }: {
   action?: (formData: FormData) => void | Promise<void>;
   module?: ManualModule;
+  submitLabel?: string;
 }) {
   const [published, setPublished] = useState(false);
   const [blueprintEnabled, setBlueprintEnabled] = useState(Boolean(module?.blueprint));
@@ -562,7 +564,7 @@ export function ModuleEditor({
             className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-[#0b4d3c]"
           >
             <Save />
-            {action ? "Create module" : "Save draft"}
+            {action ? (submitLabel ?? "Create module") : "Save draft"}
           </button>
           {published ? <Badge tone="success">Draft saved locally</Badge> : null}
         </div>
