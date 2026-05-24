@@ -41,7 +41,7 @@ export default async function LoginPage({
               <FieldLabel>Password</FieldLabel>
               <TextInput name="password" placeholder="Your password" type="password" />
             </div>
-            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-[#0b4d3c]">
+            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover">
               Sign in
             </button>
           </form>

@@ -69,7 +69,7 @@ export default async function NewEmployeePage({
           </div>
 
           <div className="flex flex-wrap gap-3 md:col-span-2">
-            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-[#0b4d3c]">
+            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover">
               Create employee account
             </button>
             <ButtonLink href="/admin/employees" variant="secondary">

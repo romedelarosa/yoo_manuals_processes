@@ -154,7 +154,7 @@ export default async function EditEmployeeAccessPage({
           </section>
 
           <div className="flex flex-wrap gap-3">
-            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-[#0b4d3c]">
+            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover">
               Save access
             </button>
             <ButtonLink href="/admin/employees" variant="secondary">

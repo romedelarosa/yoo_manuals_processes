@@ -102,7 +102,7 @@ export function ModuleAttachments({
                 <a
                   href={attachment.storagePath}
                   download={attachment.fileName}
-                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-[#0b4d3c]"
+                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover"
                 >
                   <Download />
                   Download

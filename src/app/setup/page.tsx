@@ -45,7 +45,7 @@ export default async function SetupPage({
 
         <div className="mt-6 flex flex-wrap gap-3">
           <form action={claimOwnerAccessAction}>
-            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-[#0b4d3c]">
+            <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover">
               Claim owner access
             </button>
           </form>

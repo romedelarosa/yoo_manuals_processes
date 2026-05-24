@@ -37,7 +37,7 @@ export function ButtonLink({
       className={cn(
         "inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition",
         variant === "primary" &&
-          "bg-primary text-primary-foreground shadow-sm hover:bg-[#0b4d3c]",
+          "bg-primary text-primary-foreground shadow-sm hover:bg-primary-hover",
         variant === "secondary" &&
           "border border-border bg-surface text-foreground hover:border-primary",
         variant === "ghost" && "text-muted hover:bg-surface-muted hover:text-foreground",
