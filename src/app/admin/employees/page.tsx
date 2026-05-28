@@ -1,9 +1,16 @@
 import { AppShell } from "@/components/app-shell";
+import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
 import { getBusinessName, getRoleName } from "@/lib/access";
 import { getEmployees } from "@/lib/database";
+import { deleteEmployeeAction } from "./actions";
 
-export default async function EmployeesPage() {
+export default async function EmployeesPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ message?: string }>;
+}) {
+  const params = await searchParams;
   const employees = await getEmployees();
 
   return (
@@ -13,6 +20,12 @@ export default async function EmployeesPage() {
         description="Assign employees to businesses, system permissions, and operational roles that determine module access."
         actions={<ButtonLink href="/admin/employees/new">Add employee</ButtonLink>}
       />
+
+      {params?.message ? (
+        <div className="rounded-md border border-[#efd09a] bg-[#fff8e7] px-4 py-3 text-sm text-warning">
+          {params.message}
+        </div>
+      ) : null}
 
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
@@ -28,6 +41,14 @@ export default async function EmployeesPage() {
               </tr>
             </thead>
             <tbody>
+              {employees.length === 0 ? (
+                <tr className="border-t border-border">
+                  <td className="px-4 py-6 text-muted" colSpan={6}>
+                    No active employees yet. Add an employee to assign access and modules.
+                  </td>
+                </tr>
+              ) : null}
+
               {employees.map((employee) => (
                 <tr key={employee.id} className="border-t border-border">
                   <td className="px-4 py-4">
@@ -67,12 +88,21 @@ export default async function EmployeesPage() {
                     </Badge>
                   </td>
                   <td className="px-4 py-4">
-                    <ButtonLink
-                      href={`/admin/employees/${employee.id}/edit`}
-                      variant="secondary"
-                    >
-                      Manage access
-                    </ButtonLink>
+                    <div className="flex flex-wrap gap-2">
+                      <ButtonLink
+                        href={`/admin/employees/${employee.id}/edit`}
+                        variant="secondary"
+                      >
+                        Manage access
+                      </ButtonLink>
+                      <form action={deleteEmployeeAction.bind(null, employee.id)}>
+                        <ConfirmSubmitButton
+                          confirmMessage={`Delete ${employee.fullName} from active use? Their module access will be removed, but historical records will be preserved.`}
+                        >
+                          Delete
+                        </ConfirmSubmitButton>
+                      </form>
+                    </div>
                   </td>
                 </tr>
               ))}

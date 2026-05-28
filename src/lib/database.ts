@@ -287,6 +287,7 @@ export async function getEmployees(): Promise<EmployeeProfile[]> {
       user_employee_roles(employee_roles(slug))
     `,
     )
+    .eq("status", "active")
     .order("full_name");
 
   if (error) {
