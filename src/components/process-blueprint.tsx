@@ -62,9 +62,7 @@ export function ProcessBlueprintView({
                 <h3 className="mt-5 text-lg font-semibold leading-6 text-foreground">
                   {step.title}
                 </h3>
-                <p className="mt-3 text-sm leading-6 text-muted">
-                  {step.description}
-                </p>
+                <FormattedText body={step.description} className="mt-3" />
 
                 <div className="mt-auto flex flex-wrap gap-2 pt-5">
                   <Badge>{getRoleName(step.ownerRoleId)}</Badge>
@@ -108,9 +106,7 @@ export function ProcessBlueprintView({
                       <p className="text-sm font-semibold text-foreground">
                         {step.title}
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-muted">
-                        {step.escalation}
-                      </p>
+                      <FormattedText body={step.escalation ?? ""} className="mt-1" />
                     </div>
                   </div>
                 </div>
@@ -119,5 +115,32 @@ export function ProcessBlueprintView({
         </div>
       </div>
     </Card>
+  );
+}
+
+function FormattedText({
+  body,
+  className = "",
+}: {
+  body: string;
+  className?: string;
+}) {
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  if (paragraphs.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={`${className} flex flex-col gap-3 text-sm leading-6 text-muted`}>
+      {paragraphs.map((paragraph, index) => (
+        <p key={index} className="whitespace-pre-line">
+          {paragraph}
+        </p>
+      ))}
+    </div>
   );
 }
