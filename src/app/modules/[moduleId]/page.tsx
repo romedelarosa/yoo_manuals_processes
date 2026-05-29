@@ -88,7 +88,7 @@ export default async function ModuleDetailPage({
               <h2 className="mt-2 text-xl font-semibold text-foreground">
                 {section.title}
               </h2>
-              <p className="mt-3 text-sm leading-7 text-muted">{section.body}</p>
+              <LessonBody body={section.body} />
             </Card>
           ))}
         </section>
@@ -131,5 +131,26 @@ export default async function ModuleDetailPage({
         </aside>
       </div>
     </AppShell>
+  );
+}
+
+function LessonBody({ body }: { body: string }) {
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  if (paragraphs.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-4 flex flex-col gap-4 text-sm leading-7 text-muted">
+      {paragraphs.map((paragraph, paragraphIndex) => (
+        <p key={paragraphIndex} className="whitespace-pre-line">
+          {paragraph}
+        </p>
+      ))}
+    </div>
   );
 }
