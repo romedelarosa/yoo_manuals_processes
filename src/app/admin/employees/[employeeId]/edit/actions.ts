@@ -16,6 +16,7 @@ export async function updateEmployeeAccessAction(
   const fullName = String(formData.get("fullName") ?? "").trim();
   const jobTitle = String(formData.get("jobTitle") ?? "").trim();
   const status = String(formData.get("status") ?? "active");
+  const newPassword = String(formData.get("newPassword") ?? "");
   const businessSlugs = formData.getAll("businessIds").map(String).filter(Boolean);
   const employeeRoleSlugs = formData
     .getAll("employeeRoleIds")
@@ -36,6 +37,37 @@ export async function updateEmployeeAccessAction(
     redirect(
       `/admin/employees/${employeeId}/edit?message=Select at least one business and one operational role.`,
     );
+  }
+
+  if (newPassword && newPassword.length < 8) {
+    redirect(
+      `/admin/employees/${employeeId}/edit?message=New password must be at least 8 characters.`,
+    );
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("auth_user_id")
+    .eq("id", employeeId)
+    .maybeSingle();
+
+  if (newPassword) {
+    if (!profile?.auth_user_id) {
+      redirect(
+        `/admin/employees/${employeeId}/edit?message=This employee does not have a linked auth account.`,
+      );
+    }
+
+    const { error: passwordError } = await supabase.auth.admin.updateUserById(
+      profile.auth_user_id,
+      { password: newPassword },
+    );
+
+    if (passwordError) {
+      redirect(
+        `/admin/employees/${employeeId}/edit?message=${encodeURIComponent(passwordError.message)}`,
+      );
+    }
   }
 
   await supabase
@@ -108,5 +140,9 @@ export async function updateEmployeeAccessAction(
   revalidatePath("/admin/employees");
   revalidatePath("/admin/reports");
   revalidatePath("/dashboard");
-  redirect("/admin/employees");
+  redirect(
+    `/admin/employees?message=${encodeURIComponent(
+      newPassword ? "Employee access and password updated." : "Employee access updated.",
+    )}`,
+  );
 }

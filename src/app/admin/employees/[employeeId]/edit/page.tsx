@@ -153,6 +153,30 @@ export default async function EditEmployeeAccessPage({
             </div>
           </section>
 
+          <section className="rounded-lg border border-border bg-surface-muted p-4">
+            <div className="grid gap-4 md:grid-cols-[1fr_0.9fr] md:items-end">
+              <div>
+                <h2 className="text-base font-semibold text-foreground">
+                  Password reset
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Optional. Enter a new temporary password only when you need to
+                  reset this employee&apos;s login password.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <FieldLabel>New temporary password</FieldLabel>
+                <TextInput
+                  name="newPassword"
+                  type="password"
+                  minLength={8}
+                  autoComplete="new-password"
+                  placeholder="Leave blank to keep current password"
+                />
+              </div>
+            </div>
+          </section>
+
           <div className="flex flex-wrap gap-3">
             <button className="inline-flex min-h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary-hover">
               Save access
